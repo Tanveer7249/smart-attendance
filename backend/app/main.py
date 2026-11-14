@@ -15,13 +15,16 @@ from app.api.routes import (
     audit_logs, settings as app_settings
 )
 
-# Initialize database schema
-Base.metadata.create_all(bind=engine)
-try:
-    from app.seed import ensure_admin_exists
-    ensure_admin_exists()
-except Exception as e:
-    print("Database init warning:", e)
+# Initialize database schema safely
+def init_db():
+    try:
+        Base.metadata.create_all(bind=engine)
+        from app.seed import ensure_admin_exists
+        ensure_admin_exists()
+    except Exception as e:
+        print("Database schema init warning:", e)
+
+init_db()
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -56,9 +59,22 @@ async def attendance_live_ws(websocket: WebSocket, session_id: int):
         ws_manager.disconnect(session_id, websocket)
 
 @app.get("/api/health")
+@app.get("/health")
 def health_check():
+    db_status = "connected"
+    db_err = None
+    try:
+        from sqlalchemy import text
+        with engine.connect() as conn:
+            conn.execute(text("SELECT 1"))
+    except Exception as e:
+        db_status = "error"
+        db_err = str(e)
+
     return {
-        "status": "healthy",
+        "status": "healthy" if db_status == "connected" else "database_error",
+        "database": db_status,
+        "database_error": db_err,
         "system": settings.PROJECT_NAME,
         "dual_confirmation_engine": "ACTIVE"
     }

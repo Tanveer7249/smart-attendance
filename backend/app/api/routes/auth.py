@@ -49,6 +49,13 @@ def format_user_response(user: User) -> UserResponse:
 
 @router.post("/login", response_model=Token)
 def login(login_data: LoginRequest, db: Session = Depends(get_db)):
+    # Ensure system admin exists in database
+    try:
+        from app.seed import ensure_admin_exists
+        ensure_admin_exists(db)
+    except Exception as e:
+        print("ensure_admin_exists during login note:", e)
+
     user = db.query(User).filter(User.email == login_data.email.strip().lower()).first()
     if not user or not verify_password(login_data.password, user.hashed_password):
         raise HTTPException(
