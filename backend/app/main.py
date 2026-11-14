@@ -58,6 +58,16 @@ async def attendance_live_ws(websocket: WebSocket, session_id: int):
     except WebSocketDisconnect:
         ws_manager.disconnect(session_id, websocket)
 
+@app.get("/")
+@app.get("/api")
+def root_endpoint():
+    return {
+        "status": "online",
+        "system": settings.PROJECT_NAME,
+        "dual_confirmation_engine": "ACTIVE",
+        "message": "Smart Attendance API is running. Use /api/health or /api/init-db"
+    }
+
 @app.get("/api/init-db")
 @app.get("/init-db")
 def trigger_init_db():
