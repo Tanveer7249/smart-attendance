@@ -1,0 +1,16 @@
+.git
+.gitignore
+.env
+backend/venv
+venv
+frontend/node_modules
+.pytest_cache
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite
+*.sqlite3
+smart_attendance.db
+backend/smart_attendance.db

@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+backend/venv/
+venv/
+ENV/
+env/
+.env
+
+# Testing & Cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Node & Frontend
+node_modules/
+frontend/node_modules/
+dist/
+# Note: we can keep frontend/dist or build it in Docker
+.DS_Store
+
+# Databases
+*.sqlite
+*.sqlite3
+smart_attendance.db
+backend/smart_attendance.db
