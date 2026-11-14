@@ -58,23 +58,65 @@ async def attendance_live_ws(websocket: WebSocket, session_id: int):
     except WebSocketDisconnect:
         ws_manager.disconnect(session_id, websocket)
 
+@app.get("/api/init-db")
+@app.get("/init-db")
+def trigger_init_db():
+    from app.core.database import SessionLocal, Base, engine
+    from app.models.models import User, UserRole
+    from app.seed import ensure_admin_exists
+
+    try:
+        Base.metadata.create_all(bind=engine)
+        db = SessionLocal()
+        ensure_admin_exists(db)
+        admin = db.query(User).filter(User.email == "admin@smartattendance.edu").first()
+        admin_info = {"id": admin.id, "email": admin.email, "role": admin.role.value} if admin else None
+        db.close()
+        return {
+            "status": "success",
+            "message": "Database tables created and Admin account verified!",
+            "admin": admin_info
+        }
+    except Exception as e:
+        import traceback
+        return {
+            "status": "error",
+            "error": str(e),
+            "traceback": traceback.format_exc()
+        }
+
 @app.get("/api/health")
 @app.get("/health")
 def health_check():
     db_status = "connected"
     db_err = None
+    admin_exists = False
+    tables = []
+
     try:
-        from sqlalchemy import text
+        from sqlalchemy import text, inspect
         with engine.connect() as conn:
             conn.execute(text("SELECT 1"))
+        
+        inspector = inspect(engine)
+        tables = inspector.get_table_names()
+
+        from app.core.database import SessionLocal
+        from app.models.models import User
+        db = SessionLocal()
+        admin = db.query(User).filter(User.email == "admin@smartattendance.edu").first()
+        admin_exists = (admin is not None)
+        db.close()
     except Exception as e:
         db_status = "error"
         db_err = str(e)
 
     return {
-        "status": "healthy" if db_status == "connected" else "database_error",
+        "status": "healthy" if db_status == "connected" and admin_exists else ("connected_uninitialized" if db_status == "connected" else "database_error"),
         "database": db_status,
         "database_error": db_err,
+        "admin_account_exists": admin_exists,
+        "tables_in_database": tables,
         "system": settings.PROJECT_NAME,
         "dual_confirmation_engine": "ACTIVE"
     }

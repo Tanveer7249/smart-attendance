@@ -99,8 +99,8 @@ def ensure_admin_exists(db: Session = None):
             db.add(settings)
             db.commit()
 
-        # Check if admin user exists
-        admin = db.query(User).filter(User.role == UserRole.ADMIN).first()
+        # Check if admin user exists by email
+        admin = db.query(User).filter(User.email == "admin@smartattendance.edu").first()
         if not admin:
             admin = User(
                 email="admin@smartattendance.edu",
@@ -113,6 +113,13 @@ def ensure_admin_exists(db: Session = None):
             db.add(admin)
             db.commit()
             print("Master Administrator created: admin@smartattendance.edu / Admin@123")
+        else:
+            # Always ensure admin password is Admin@123 and role is ADMIN
+            admin.hashed_password = get_password_hash("Admin@123")
+            admin.role = UserRole.ADMIN
+            admin.is_active = True
+            db.commit()
+            print("Master Administrator verified: admin@smartattendance.edu / Admin@123")
     except Exception as e:
         db.rollback()
         print(f"ensure_admin_exists note: {e}")

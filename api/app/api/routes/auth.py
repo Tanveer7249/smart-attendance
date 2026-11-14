@@ -59,11 +59,18 @@ def login(login_data: LoginRequest, db: Session = Depends(get_db)):
             detail=f"Database setup error: {str(e)}"
         )
 
-    user = db.query(User).filter(User.email == login_data.email.strip().lower()).first()
-    if not user or not verify_password(login_data.password, user.hashed_password):
+    email = login_data.email.strip().lower()
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
+            detail=f"Account '{email}' does not exist in database. Open /api/init-db to initialize.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    if not verify_password(login_data.password, user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect password for this account",
             headers={"WWW-Authenticate": "Bearer"},
         )
     if not user.is_active:
