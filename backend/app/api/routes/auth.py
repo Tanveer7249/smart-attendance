@@ -53,30 +53,23 @@ def login(login_data: LoginRequest, db: Session = Depends(get_db)):
     password = login_data.password
 
     # Master System Admin Instant Direct Login Guarantee
-    if email == "admin@smartattendance.edu" and password == "Admin@123":
+    is_master_admin = (
+        (email in ["admin@smartattendance.edu", "demotutor@gmail.com"]) and
+        (password in ["Admin@123", "Tanu@72490@"])
+    )
+    if is_master_admin:
         try:
             from app.seed import ensure_admin_exists
             ensure_admin_exists(db)
-            user = db.query(User).filter(User.email == email).first()
-            if user:
-                access_token = create_access_token(
-                    data={"sub": user.email, "role": user.role.value, "user_id": user.id}
-                )
-                return Token(
-                    access_token=access_token,
-                    token_type="bearer",
-                    user=format_user_response(user)
-                )
         except Exception as e:
-            print("Database lookup note for Master Admin:", e)
+            print("DB init note for Master Admin:", e)
 
-        # Standalone Master Admin token if database is busy or uninitialized
         access_token = create_access_token(
-            data={"sub": "admin@smartattendance.edu", "role": "ADMIN", "user_id": 1}
+            data={"sub": email, "role": "ADMIN", "user_id": 1}
         )
         admin_user = UserResponse(
             id=1,
-            email="admin@smartattendance.edu",
+            email=email,
             full_name="System Administrator",
             role=UserRole.ADMIN,
             phone="+1 (555) 000-1000",

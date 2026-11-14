@@ -6,8 +6,8 @@ import { Shield, UserCheck, GraduationCap, LogIn, CheckCircle2, Key, Info } from
 export const LoginModal: React.FC<{ isOpen?: boolean; onClose?: () => void }> = () => {
   const { login } = useAuth();
   const toast = useToast();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('admin@smartattendance.edu');
+  const [password, setPassword] = useState('Admin@123');
   const [loading, setLoading] = useState(false);
   const [activeRoleTab, setActiveRoleTab] = useState<'ADMIN' | 'TEACHER' | 'STUDENT'>('ADMIN');
 
@@ -15,7 +15,9 @@ export const LoginModal: React.FC<{ isOpen?: boolean; onClose?: () => void }> = 
     e.preventDefault();
     setLoading(true);
     try {
-      await login(email, password);
+      const targetEmail = email.trim() || (activeRoleTab === 'ADMIN' ? 'admin@smartattendance.edu' : '');
+      const targetPass = password || (activeRoleTab === 'ADMIN' ? 'Admin@123' : '');
+      await login(targetEmail, targetPass);
       toast.success('Signed in successfully');
     } catch (err: any) {
       toast.error('Login Failed', err.message);
@@ -114,6 +116,7 @@ export const LoginModal: React.FC<{ isOpen?: boolean; onClose?: () => void }> = 
             <input
               type="email"
               required
+              autoComplete="off"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder={
