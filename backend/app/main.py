@@ -39,18 +39,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include API routes
-app.include_router(auth.router, prefix=settings.API_V1_STR)
-app.include_router(users.router, prefix=settings.API_V1_STR)
-app.include_router(academics.router, prefix=settings.API_V1_STR)
-app.include_router(classes.router, prefix=settings.API_V1_STR)
-app.include_router(attendance.router, prefix=settings.API_V1_STR)
-app.include_router(analytics.router, prefix=settings.API_V1_STR)
-app.include_router(leaves.router, prefix=settings.API_V1_STR)
-app.include_router(disputes.router, prefix=settings.API_V1_STR)
-app.include_router(notifications.router, prefix=settings.API_V1_STR)
-app.include_router(audit_logs.router, prefix=settings.API_V1_STR)
-app.include_router(app_settings.router, prefix=settings.API_V1_STR)
+# Include API routes (both with and without /api prefix for serverless compatibility)
+routers_list = [auth, users, academics, classes, attendance, analytics, leaves, disputes, notifications, audit_logs, app_settings]
+for r in routers_list:
+    app.include_router(r.router, prefix=settings.API_V1_STR)
+    app.include_router(r.router, prefix="")
 
 # Real-time live attendance WebSocket route
 @app.websocket("/ws/attendance/{session_id}")
