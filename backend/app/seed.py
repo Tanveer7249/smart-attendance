@@ -69,5 +69,50 @@ def reset_and_seed():
     finally:
         db.close()
 
+def ensure_admin_exists(db: Session = None):
+    """
+    Safely ensures SystemSettings and the Master Admin account exist,
+    WITHOUT dropping any tables or deleting existing data.
+    Safe for production serverless / Supabase startup.
+    """
+    close_db = False
+    if db is None:
+        db = SessionLocal()
+        close_db = True
+
+    try:
+        # Check if settings exist
+        if not db.query(SystemSettings).first():
+            settings = SystemSettings(
+                min_attendance_threshold=75.0,
+                default_late_threshold_minutes=15,
+                default_qr_refresh_seconds=30,
+                allow_pin_fallback=True,
+                gps_verification_enabled=False
+            )
+            db.add(settings)
+            db.commit()
+
+        # Check if admin user exists
+        admin = db.query(User).filter(User.role == UserRole.ADMIN).first()
+        if not admin:
+            admin = User(
+                email="admin@smartattendance.edu",
+                hashed_password=get_password_hash("Admin@123"),
+                full_name="System Administrator",
+                role=UserRole.ADMIN,
+                phone="+1 (555) 000-1000",
+                avatar_url=None
+            )
+            db.add(admin)
+            db.commit()
+            print("Master Administrator created: admin@smartattendance.edu / Admin@123")
+    except Exception as e:
+        db.rollback()
+        print(f"ensure_admin_exists note: {e}")
+    finally:
+        if close_db:
+            db.close()
+
 if __name__ == "__main__":
     reset_and_seed()

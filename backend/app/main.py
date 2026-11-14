@@ -17,6 +17,11 @@ from app.api.routes import (
 
 # Initialize database schema
 Base.metadata.create_all(bind=engine)
+try:
+    from app.seed import ensure_admin_exists
+    ensure_admin_exists()
+except Exception as e:
+    print("Database init warning:", e)
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
