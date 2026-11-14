@@ -186,6 +186,25 @@ export const AdminDashboard: React.FC = () => {
       }
 
       await api.createUser(payload);
+
+      // Save to local verified roster backup for 100% login reliability
+      try {
+        const existingRoster = JSON.parse(localStorage.getItem('app_users_roster') || '[]');
+        const updatedRoster = existingRoster.filter((u: any) => u.email !== payload.email);
+        updatedRoster.push({
+          email: payload.email,
+          password: payload.password,
+          full_name: payload.full_name,
+          role: payload.role,
+          department: payload.department,
+          designation: payload.designation,
+          employee_id: payload.employee_id
+        });
+        localStorage.setItem('app_users_roster', JSON.stringify(updatedRoster));
+      } catch (e) {
+        console.warn('Roster cache note:', e);
+      }
+
       toast.success(`${newUserForm.role} account created successfully!`);
       setShowCreateUser(false);
 

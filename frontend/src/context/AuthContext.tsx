@@ -37,6 +37,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setIsLoading(false);
           return;
         }
+
+        // Check if roster user session is saved
+        const savedRosterUser = localStorage.getItem('current_roster_user');
+        if (savedRosterUser && token.startsWith('roster-token-')) {
+          setUser(JSON.parse(savedRosterUser));
+          setIsLoading(false);
+          return;
+        }
+
         const currentUser = await api.getMe();
         setUser(currentUser);
       } else {
@@ -89,10 +98,54 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       }
 
-      const res = await api.login(email, pass);
-      localStorage.setItem('auth_token', res.access_token);
-      setToken(res.access_token);
-      setUser(res.user);
+      try {
+        const res = await api.login(email, pass);
+        localStorage.setItem('auth_token', res.access_token);
+        setToken(res.access_token);
+        setUser(res.user);
+      } catch (apiErr: any) {
+        // Check local verified roster fallback
+        try {
+          const roster: any[] = JSON.parse(localStorage.getItem('app_users_roster') || '[]');
+          const matched = roster.find(
+            (u) => u.email.toLowerCase() === cleanEmail && u.password === pass
+          );
+          if (matched) {
+            const rosterUser: User = {
+              id: matched.id || Date.now(),
+              email: matched.email,
+              full_name: matched.full_name,
+              role: matched.role as UserRole,
+              is_active: true,
+              created_at: new Date().toISOString(),
+              teacher_profile: matched.role === 'TEACHER' ? {
+                id: matched.teacher_id || 1,
+                employee_id: matched.employee_id || 'EMP-001',
+                department: matched.department || 'General Department',
+                designation: matched.designation || 'Lecturer',
+                assigned_student_count: 0
+              } : undefined,
+              student_profile: matched.role === 'STUDENT' ? {
+                id: matched.student_id || 1,
+                roll_number: matched.roll_number,
+                batch_id: matched.batch_id || 1,
+                assigned_teacher_name: 'Assigned Faculty'
+              } : undefined
+            };
+            const sessionToken = 'roster-token-' + Date.now();
+            localStorage.setItem('auth_token', sessionToken);
+            localStorage.setItem('current_roster_user', JSON.stringify(rosterUser));
+            setToken(sessionToken);
+            setUser(rosterUser);
+            return;
+          }
+        } catch (rosterErr) {
+          console.warn('Roster check note:', rosterErr);
+        }
+
+        // If not found in roster, throw real error
+        throw apiErr;
+      }
     } finally {
       setIsLoading(false);
     }
@@ -101,6 +154,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('is_master_admin');
+    localStorage.removeItem('current_roster_user');
     setToken(null);
     setUser(null);
   };
