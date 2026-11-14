@@ -7,6 +7,10 @@ if db_url.startswith("postgres://"):
     db_url = db_url.replace("postgres://", "postgresql://", 1)
 
 if db_url.startswith("sqlite"):
+    # On serverless (Vercel / AWS Lambda), root directory is read-only.
+    if os.getenv("VERCEL") or not os.access(".", os.W_OK):
+        db_url = "sqlite:////tmp/smart_attendance.db"
+
     connect_args = {"check_same_thread": False}
     engine = create_engine(
         db_url,

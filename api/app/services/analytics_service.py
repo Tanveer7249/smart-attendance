@@ -3,12 +3,6 @@ from datetime import datetime, timedelta, timezone, date
 from typing import List, Dict, Any, Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-import openpyxl
-from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
-from reportlab.lib.pagesizes import letter, landscape
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, TableStyle
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib import colors
 
 from app.models.models import (
     User, Student, Teacher, Batch, Subject, ClassSession,
@@ -219,6 +213,8 @@ class AnalyticsService:
 
     @staticmethod
     def export_attendance_excel(db: Session, batch_id: Optional[int] = None, subject_id: Optional[int] = None) -> io.BytesIO:
+        import openpyxl
+        from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
         wb = openpyxl.Workbook()
         ws = wb.active
         ws.title = "Attendance Report"
