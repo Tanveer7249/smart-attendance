@@ -75,6 +75,12 @@ def ensure_admin_exists(db: Session = None):
     WITHOUT dropping any tables or deleting existing data.
     Safe for production serverless / Supabase startup.
     """
+    # 1. Ensure all schema tables exist in the target database
+    try:
+        Base.metadata.create_all(bind=engine)
+    except Exception as e:
+        print("Schema create_all note:", e)
+
     close_db = False
     if db is None:
         db = SessionLocal()

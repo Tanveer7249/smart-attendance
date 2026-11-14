@@ -54,7 +54,10 @@ def login(login_data: LoginRequest, db: Session = Depends(get_db)):
         from app.seed import ensure_admin_exists
         ensure_admin_exists(db)
     except Exception as e:
-        print("ensure_admin_exists during login note:", e)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Database setup error: {str(e)}"
+        )
 
     user = db.query(User).filter(User.email == login_data.email.strip().lower()).first()
     if not user or not verify_password(login_data.password, user.hashed_password):
