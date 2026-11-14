@@ -1,3 +1,14 @@
+---
+title: Smart Attendance
+emoji: 🎯
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+app_port: 7860
+pinned: false
+license: apache-2.0
+---
+
 # Smart Attendance Management System
 ### Enterprise Full-Stack Zero-Trust Attendance Architecture with Dual Confirmation
 
