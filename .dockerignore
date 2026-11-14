@@ -14,3 +14,4 @@ __pycache__
 *.sqlite3
 smart_attendance.db
 backend/smart_attendance.db
+

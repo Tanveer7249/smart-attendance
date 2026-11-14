@@ -30,6 +30,12 @@ COPY run.py ./
 # Copy compiled frontend from Stage 1
 COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
 
+# Create user with UID 1000 (required for Hugging Face Spaces) and grant permissions to /app
+RUN useradd -m -u 1000 appuser && \
+    chown -R appuser:appuser /app
+
+USER appuser
+
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONPATH="/app/backend"
@@ -42,3 +48,4 @@ EXPOSE 7860
 
 # Run unified server
 CMD ["python", "run.py"]
+
