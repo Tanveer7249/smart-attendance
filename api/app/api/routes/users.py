@@ -102,22 +102,29 @@ def assign_students_to_teacher(
     """
     Admin explicitly assigns one or multiple students to a specific Teacher.
     """
-    teacher = db.query(Teacher).filter(Teacher.id == data.teacher_id).first()
+    teacher = db.query(Teacher).filter(
+        (Teacher.id == data.teacher_id) | (Teacher.user_id == data.teacher_id)
+    ).first()
     if not teacher:
         raise HTTPException(status_code=404, detail="Teacher not found")
 
     created_assignments = []
     for s_id in data.student_ids:
+        student = db.query(Student).filter(
+            (Student.id == s_id) | (Student.user_id == s_id)
+        ).first()
+        if not student:
+            continue
+
         existing = db.query(TeacherStudentAssignment).filter(
-            TeacherStudentAssignment.teacher_id == data.teacher_id,
-            TeacherStudentAssignment.student_id == s_id,
-            TeacherStudentAssignment.subject_id == data.subject_id
+            TeacherStudentAssignment.teacher_id == teacher.id,
+            TeacherStudentAssignment.student_id == student.id
         ).first()
 
         if not existing:
             assignment = TeacherStudentAssignment(
-                teacher_id=data.teacher_id,
-                student_id=s_id,
+                teacher_id=teacher.id,
+                student_id=student.id,
                 subject_id=data.subject_id
             )
             db.add(assignment)
@@ -129,13 +136,13 @@ def assign_students_to_teacher(
         action="STUDENTS_ASSIGNED_TO_TEACHER",
         entity_type="Teacher",
         entity_id=teacher.id,
-        details=f"Admin assigned {len(data.student_ids)} students to {teacher.user.full_name}"
+        details=f"Admin assigned {len(data.student_ids)} students to {teacher.user.full_name if teacher.user else 'Teacher'}"
     )
     db.add(audit)
     db.commit()
 
     all_assignments = db.query(TeacherStudentAssignment).filter(
-        TeacherStudentAssignment.teacher_id == data.teacher_id
+        TeacherStudentAssignment.teacher_id == teacher.id
     ).all()
 
     results = []

@@ -8,7 +8,7 @@ from app.core.database import get_db
 from app.models.models import (
     User, UserRole, ClassSession, SessionStatus, Teacher, Student,
     AttendanceRecord, AttendanceStatus, LeaveRequest, LeaveStatus,
-    Notification, TeacherStudentAssignment
+    Notification, TeacherStudentAssignment, Subject, TeacherCourseAssignment
 )
 from app.schemas.schemas import (
     AdminDashboardStats, TeacherDashboardStats, StudentDashboardStats,
@@ -55,51 +55,64 @@ def get_teacher_dashboard(
 ):
     teacher = current_user.teacher_profile
     if not teacher:
-        raise HTTPException(status_code=400, detail="Teacher profile not found")
+        teacher = db.query(Teacher).filter(Teacher.user_id == current_user.id).first()
+        if not teacher:
+            teacher = Teacher(
+                user_id=current_user.id,
+                employee_id=f"EMP-{current_user.id:04d}",
+                department="Academics",
+                designation="Faculty"
+            )
+            db.add(teacher)
+            db.commit()
+            db.refresh(teacher)
 
     today_str = date.today().isoformat()
     today_classes = db.query(ClassSession).filter(
-        ClassSession.teacher_id == teacher.id,
+        (ClassSession.teacher_id == teacher.id) | (ClassSession.teacher_id == current_user.id),
         ClassSession.session_date == today_str
     ).count()
 
     active_session = db.query(ClassSession).filter(
-        ClassSession.teacher_id == teacher.id,
+        (ClassSession.teacher_id == teacher.id) | (ClassSession.teacher_id == current_user.id),
         ClassSession.status == SessionStatus.ACTIVE
     ).first()
 
     upcoming_classes = db.query(ClassSession).filter(
-        ClassSession.teacher_id == teacher.id,
+        (ClassSession.teacher_id == teacher.id) | (ClassSession.teacher_id == current_user.id),
         ClassSession.status.in_([SessionStatus.SCHEDULED, SessionStatus.ACTIVE])
     ).order_by(ClassSession.session_date, ClassSession.start_time).limit(5).all()
 
     total_classes = db.query(ClassSession).filter(
-        ClassSession.teacher_id == teacher.id,
+        (ClassSession.teacher_id == teacher.id) | (ClassSession.teacher_id == current_user.id),
         ClassSession.status == SessionStatus.COMPLETED
     ).count()
 
-    # Assigned students list
+    # Assigned students list (support assignment by Teacher.id or User.id)
     assignments = db.query(TeacherStudentAssignment).filter(
-        TeacherStudentAssignment.teacher_id == teacher.id
+        (TeacherStudentAssignment.teacher_id == teacher.id) |
+        (TeacherStudentAssignment.teacher_id == current_user.id)
     ).all()
 
     assigned_students = []
+    seen_students = set()
     for a in assignments:
         st = a.student
-        if st and st.user:
+        if st and st.user and st.id not in seen_students:
+            seen_students.add(st.id)
             assigned_students.append({
                 "assignment_id": a.id,
                 "student_id": st.id,
                 "full_name": st.user.full_name,
                 "email": st.user.email,
-                "roll_number": st.roll_number,
+                "roll_number": st.roll_number or f"STU-{st.id:04d}",
                 "batch_name": st.batch.name if st.batch else "General",
                 "assigned_at": a.assigned_at.isoformat() if a.assigned_at else None
             })
 
     # Assigned courses list
     teacher_courses = db.query(Subject).join(TeacherCourseAssignment).filter(
-        TeacherCourseAssignment.teacher_id == teacher.id,
+        (TeacherCourseAssignment.teacher_id == teacher.id) | (TeacherCourseAssignment.teacher_id == current_user.id),
         Subject.is_active == True
     ).all()
     from app.schemas.schemas import SubjectResponse

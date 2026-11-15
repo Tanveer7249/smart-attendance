@@ -5,6 +5,7 @@ import {
   Subject, AttendanceStatus
 } from '../../types';
 import { useToast } from '../../context/ToastContext';
+import { useAuth } from '../../context/AuthContext';
 import { QRCodeSVG } from 'qrcode.react';
 import {
   Play, StopCircle, RefreshCw, CheckCircle2, XCircle, Clock,
@@ -14,6 +15,7 @@ import {
 
 export const TeacherDashboard: React.FC = () => {
   const toast = useToast();
+  const { user } = useAuth();
   const [stats, setStats] = useState<TeacherDashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'classes' | 'students'>('classes');
@@ -319,9 +321,9 @@ export const TeacherDashboard: React.FC = () => {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-gradient-to-r from-navy-900 via-brand-900 to-navy-900 p-6 rounded-2xl text-white shadow-xl shadow-navy-950/20 border border-navy-800">
         <div>
           <span className="text-xs font-bold uppercase tracking-wider text-brand-300">Faculty Dashboard</span>
-          <h1 className="text-2xl font-bold tracking-tight mt-0.5">Welcome, {stats?.teacher_name}</h1>
+          <h1 className="text-2xl font-bold tracking-tight mt-0.5">Welcome, {stats?.teacher_name || user?.full_name || 'Faculty Member'}</h1>
           <p className="text-xs text-slate-300 mt-1">
-            Department of {stats?.department} • Dual-Confirmation Attendance Portal
+            Department of {stats?.department || user?.teacher_profile?.department || 'Academics'} • Dual-Confirmation Attendance Portal
           </p>
         </div>
 
