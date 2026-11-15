@@ -318,12 +318,12 @@ export const TeacherDashboard: React.FC = () => {
   return (
     <div className="space-y-6 pb-12">
       {/* Top Welcome & Actions Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-gradient-to-r from-navy-900 via-brand-900 to-navy-900 p-6 rounded-2xl text-white shadow-xl shadow-navy-950/20 border border-navy-800">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-gradient-to-r from-navy-950 via-[#0B132B] to-navy-900 p-6 rounded-2xl text-white shadow-2xl shadow-navy-950/30 border border-slate-700/50 backdrop-blur-md">
         <div>
-          <span className="text-xs font-bold uppercase tracking-wider text-brand-300">Faculty Dashboard</span>
-          <h1 className="text-2xl font-bold tracking-tight mt-0.5">Welcome, {stats?.teacher_name || user?.full_name || 'Faculty Member'}</h1>
-          <p className="text-xs text-slate-300 mt-1">
-            Department of {stats?.department || user?.teacher_profile?.department || 'Academics'} • Dual-Confirmation Attendance Portal
+          <span className="text-xs font-bold uppercase tracking-wider text-amber-400">Faculty Dashboard • PI Pascals Institute PVT LTD</span>
+          <h1 className="text-2xl font-extrabold tracking-tight mt-0.5">Welcome, {stats?.teacher_name || user?.full_name || 'Faculty Member'}</h1>
+          <p className="text-xs text-slate-300 mt-1 font-medium">
+            Department of {stats?.department || user?.teacher_profile?.department || 'Academics'} • PI Pascals Attendance System
           </p>
         </div>
 

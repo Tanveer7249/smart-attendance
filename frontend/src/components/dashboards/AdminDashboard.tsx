@@ -495,16 +495,16 @@ export const AdminDashboard: React.FC = () => {
   return (
     <div className="space-y-6 pb-12">
       {/* Top Banner & Quick Controls */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-gradient-to-r from-navy-900 via-brand-900 to-navy-900 p-6 rounded-2xl text-white shadow-xl shadow-navy-950/20 border border-navy-800">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-gradient-to-r from-navy-950 via-[#0B132B] to-navy-900 p-6 rounded-2xl text-white shadow-2xl shadow-navy-950/30 border border-slate-700/50 backdrop-blur-md">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight">Admin Operations Center</h1>
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-brand-500/30 text-brand-200 border border-brand-400/30">
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-2xl font-extrabold tracking-tight">Admin Operations Center</h1>
+            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wide bg-amber-400/20 text-amber-300 border border-amber-400/30">
               System Live
             </span>
           </div>
-          <p className="text-xs text-slate-300 mt-1 max-w-xl">
-            Real-time oversight of course creation, teacher &amp; student account provisioning, and many-to-many allocations.
+          <p className="text-xs text-slate-300 mt-1 max-w-xl font-medium">
+            PI Pascals Institute PVT LTD • Real-time oversight of course creation, teacher &amp; student account provisioning, and many-to-many allocations.
           </p>
         </div>
 

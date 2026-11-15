@@ -50,20 +50,22 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode }) => {
         <div className="flex items-center justify-between h-16">
           {/* Logo & Brand */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-700 via-brand-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-brand-500/20 text-white font-bold text-lg">
-              <CheckCircle2 className="w-6 h-6 text-white" />
-            </div>
+            <img
+              src="/logo.png"
+              alt="PI Pascals Institute"
+              className="h-10 w-auto object-contain rounded-xl shadow-md border border-slate-200/50 dark:border-navy-700/60"
+            />
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-bold text-lg tracking-tight text-slate-900 dark:text-white">
-                  Smart<span className="text-brand-600 dark:text-brand-400">Attend</span>
+                <span className="font-extrabold text-base sm:text-lg tracking-tight text-slate-900 dark:text-white">
+                  PI Pascals <span className="text-amber-500 dark:text-amber-400">Attendance</span>
                 </span>
-                <span className="px-2 py-0.5 rounded text-[10px] font-semibold tracking-wide bg-brand-100 text-brand-700 dark:bg-brand-950 dark:text-brand-300 border border-brand-200 dark:border-brand-800 uppercase">
-                  Dual-Verify
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold tracking-wider bg-amber-500/10 text-amber-700 dark:bg-amber-400/10 dark:text-amber-300 border border-amber-500/30 uppercase">
+                  Official
                 </span>
               </div>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">
-                Production Attendance Management System
+              <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 hidden sm:block">
+                PI Pascals Institute PVT LTD
               </p>
             </div>
           </div>

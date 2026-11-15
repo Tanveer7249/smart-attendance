@@ -37,12 +37,20 @@ export const LoginModal: React.FC<{ isOpen?: boolean; onClose?: () => void }> = 
     <div className="flex items-center justify-center min-h-[75vh] p-4">
       <div className="bg-white dark:bg-navy-900 rounded-3xl border border-slate-200 dark:border-navy-800 max-w-md w-full p-8 shadow-2xl space-y-6">
         {/* Header */}
-        <div className="text-center space-y-1">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-brand-600 to-indigo-500 text-white flex items-center justify-center mx-auto shadow-lg shadow-brand-500/30">
-            <CheckCircle2 className="w-7 h-7" />
+        <div className="text-center space-y-2">
+          <div className="flex justify-center">
+            <img
+              src="/logo.png"
+              alt="PI Pascals Institute"
+              className="h-14 w-auto object-contain rounded-2xl shadow-xl shadow-navy-950/20 border border-slate-200/60 dark:border-navy-700/80"
+            />
           </div>
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white pt-2">Sign In to SmartAttend</h2>
-          <p className="text-xs text-slate-500">Dual-Confirmation Attendance Portal</p>
+          <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white pt-1 tracking-tight">
+            PI Pascals <span className="text-amber-500">Attendance</span>
+          </h2>
+          <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
+            PI Pascals Institute PVT LTD • Dual-Confirmation Attendance Portal
+          </p>
         </div>
 
         {/* Role Tab Selector */}

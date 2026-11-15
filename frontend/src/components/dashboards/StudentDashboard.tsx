@@ -261,12 +261,13 @@ export const StudentDashboard: React.FC = () => {
   return (
     <div className="space-y-6 pb-12">
       {/* Welcome Hero Card */}
-      <div className="bg-gradient-to-r from-navy-900 via-brand-900 to-navy-950 p-6 rounded-2xl text-white shadow-xl shadow-navy-950/20 border border-navy-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div className="bg-gradient-to-r from-navy-950 via-[#0B132B] to-navy-900 p-6 rounded-2xl text-white shadow-2xl shadow-navy-950/30 border border-slate-700/50 backdrop-blur-md flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">Student Portal</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-amber-400">Student Portal • PI Pascals Institute PVT LTD</span>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight mt-1">{stats?.student_name}</h1>
+          <h1 className="text-2xl font-extrabold tracking-tight mt-1">{stats?.student_name}</h1>
+          <p className="text-xs text-slate-300 mt-0.5 font-medium">PI Pascals Attendance System</p>
           <div className="mt-2 flex items-center gap-1.5 flex-wrap">
             <span className="text-[11px] text-slate-400">Assigned Faculty Mentors:</span>
             {stats?.assigned_teachers && stats.assigned_teachers.length > 0 ? (

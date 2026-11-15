@@ -2,7 +2,8 @@ import os
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
-    PROJECT_NAME: str = "Smart Attendance Management System"
+    PROJECT_NAME: str = "PI Pascals Attendance System"
+    COMPANY_NAME: str = "PI Pascals Institute PVT LTD"
     API_V1_STR: str = "/api"
     SECRET_KEY: str = os.getenv("SECRET_KEY", "super-secret-key-change-in-production-smart-attendance-2026")
     ALGORITHM: str = "HS256"
