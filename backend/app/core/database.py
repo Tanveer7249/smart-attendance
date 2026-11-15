@@ -87,10 +87,20 @@ else:
         elif ":5432" in sanitized_db_url:
             candidates.append(sanitized_db_url.replace(":5432", ":6543"))
 
+    # Expand candidates with explicit psycopg2 / psycopg drivers
+    driver_candidates = []
+    for base_c in candidates:
+        if base_c.startswith("postgresql://"):
+            driver_candidates.append(base_c.replace("postgresql://", "postgresql+psycopg2://", 1))
+            driver_candidates.append(base_c.replace("postgresql://", "postgresql+psycopg://", 1))
+            driver_candidates.append(base_c)
+        else:
+            driver_candidates.append(base_c)
+
     connected = False
     last_err = None
 
-    for target_url in candidates:
+    for target_url in driver_candidates:
         connect_args = {"connect_timeout": 7}
         if "supabase" in target_url or "sslmode" not in target_url:
             connect_args["sslmode"] = "require"
