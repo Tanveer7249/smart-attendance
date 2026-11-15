@@ -64,6 +64,22 @@ else:
     # Try connecting to PostgreSQL / Supabase
     candidates = [sanitized_db_url]
 
+    # If Supabase direct connection (db.<ref>.supabase.co) is used, add IPv4 pooler candidates (critical for Vercel)
+    if "db." in sanitized_db_url and ".supabase.co" in sanitized_db_url:
+        try:
+            ref = sanitized_db_url.split("db.")[1].split(".supabase.co")[0]
+            auth_part = sanitized_db_url.split("://")[1].split("@")[0]
+            password = auth_part.split(":", 1)[1] if ":" in auth_part else ""
+            for port in [6543, 5432]:
+                candidates.append(
+                    f"postgresql://postgres.{ref}:{password}@aws-0-ap-south-1.pooler.supabase.com:{port}/postgres?sslmode=require"
+                )
+                candidates.append(
+                    f"postgresql://postgres.{ref}:{password}@aws-0-ap-southeast-1.pooler.supabase.com:{port}/postgres?sslmode=require"
+                )
+        except Exception as ex:
+            print("Direct to pooler candidate note:", ex)
+
     # If Supabase pooler is used, generate alternate candidate (6543 <-> 5432)
     if "pooler.supabase.com" in sanitized_db_url:
         if ":6543" in sanitized_db_url:
