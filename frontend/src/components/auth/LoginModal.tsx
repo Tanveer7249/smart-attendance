@@ -1,36 +1,31 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
-import { Shield, UserCheck, GraduationCap, LogIn, CheckCircle2, Key, Info } from 'lucide-react';
+import { Shield, UserCheck, GraduationCap, LogIn, Info } from 'lucide-react';
 
 export const LoginModal: React.FC<{ isOpen?: boolean; onClose?: () => void }> = () => {
   const { login } = useAuth();
   const toast = useToast();
-  const [email, setEmail] = useState('admin@smartattendance.edu');
-  const [password, setPassword] = useState('Admin@123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [activeRoleTab, setActiveRoleTab] = useState<'ADMIN' | 'TEACHER' | 'STUDENT'>('ADMIN');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email.trim() || !password) {
+      toast.warning('Please enter both email and password');
+      return;
+    }
     setLoading(true);
     try {
-      const targetEmail = email.trim() || (activeRoleTab === 'ADMIN' ? 'admin@smartattendance.edu' : '');
-      const targetPass = password || (activeRoleTab === 'ADMIN' ? 'Admin@123' : '');
-      await login(targetEmail, targetPass);
+      await login(email.trim(), password);
       toast.success('Signed in successfully');
     } catch (err: any) {
       toast.error('Login Failed', err.message);
     } finally {
       setLoading(false);
     }
-  };
-
-  const fillAdminCredentials = () => {
-    setEmail('admin@smartattendance.edu');
-    setPassword('Admin@123');
-    setActiveRoleTab('ADMIN');
-    toast.info('Initial Admin credentials loaded');
   };
 
   return (
@@ -59,8 +54,8 @@ export const LoginModal: React.FC<{ isOpen?: boolean; onClose?: () => void }> = 
             type="button"
             onClick={() => {
               setActiveRoleTab('ADMIN');
-              setEmail('admin@smartattendance.edu');
-              setPassword('Admin@123');
+              setEmail('');
+              setPassword('');
             }}
             className={`flex-1 py-2 rounded-lg flex items-center justify-center gap-1.5 transition-all ${
               activeRoleTab === 'ADMIN' ? 'bg-white dark:bg-navy-900 text-rose-600 shadow-sm' : 'text-slate-500'
@@ -129,10 +124,10 @@ export const LoginModal: React.FC<{ isOpen?: boolean; onClose?: () => void }> = 
               onChange={(e) => setEmail(e.target.value)}
               placeholder={
                 activeRoleTab === 'ADMIN'
-                  ? 'admin@smartattendance.edu'
+                  ? 'admin@pascalsinstitute.com'
                   : activeRoleTab === 'TEACHER'
-                  ? 'teacher@school.edu'
-                  : 'student@school.edu'
+                  ? 'teacher@pascalsinstitute.com'
+                  : 'student@pascalsinstitute.com'
               }
               className="w-full text-xs px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-navy-800 border border-slate-200 dark:border-navy-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
@@ -161,20 +156,6 @@ export const LoginModal: React.FC<{ isOpen?: boolean; onClose?: () => void }> = 
             {loading ? 'Authenticating...' : `Sign In as ${activeRoleTab}`}
           </button>
         </form>
-
-        {/* Quick initial admin button */}
-        {activeRoleTab === 'ADMIN' && (
-          <div className="pt-2 text-center">
-            <button
-              type="button"
-              onClick={fillAdminCredentials}
-              className="text-xs text-brand-600 hover:text-brand-700 dark:text-brand-400 font-semibold underline flex items-center justify-center gap-1 mx-auto"
-            >
-              <Key className="w-3.5 h-3.5" />
-              Fill Initial Admin Credentials (Admin@123)
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );
