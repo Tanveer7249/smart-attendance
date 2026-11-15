@@ -132,7 +132,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 assigned_teacher_name: 'Assigned Faculty'
               } : undefined
             };
-            const sessionToken = 'roster-token-' + Date.now();
+            const sessionToken = `roster-token-${matched.role}-${matched.email}`;
             localStorage.setItem('auth_token', sessionToken);
             localStorage.setItem('current_roster_user', JSON.stringify(rosterUser));
             setToken(sessionToken);

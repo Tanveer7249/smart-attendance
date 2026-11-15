@@ -95,9 +95,28 @@ def trigger_init_db():
             "traceback": traceback.format_exc()
         }
 
+@app.get("/api/db-status")
+@app.get("/db-status")
+def db_status_endpoint():
+    from app.core.database import active_db_type, postgres_connection_error, configured_db_url_masked
+    is_persistent = (active_db_type == "postgresql")
+    return {
+        "status": "healthy" if is_persistent else "warning",
+        "active_database": active_db_type,
+        "is_persistent": is_persistent,
+        "configured_database_url": configured_db_url_masked,
+        "postgres_connection_error": postgres_connection_error,
+        "message": (
+            "Connected to persistent PostgreSQL / Supabase database."
+            if is_persistent
+            else "Running on temporary SQLite fallback because PostgreSQL failed to connect. Data will be lost when serverless containers recycle. Please check DATABASE_URL in Vercel settings."
+        )
+    }
+
 @app.get("/api/health")
 @app.get("/health")
 def health_check():
+    from app.core.database import active_db_type, postgres_connection_error, configured_db_url_masked
     db_status = "connected"
     db_err = None
     admin_exists = False
@@ -124,6 +143,9 @@ def health_check():
     return {
         "status": "healthy" if db_status == "connected" and admin_exists else ("connected_uninitialized" if db_status == "connected" else "database_error"),
         "database": db_status,
+        "active_database": active_db_type,
+        "configured_database_url": configured_db_url_masked,
+        "postgres_connection_error": postgres_connection_error,
         "database_error": db_err,
         "admin_account_exists": admin_exists,
         "tables_in_database": tables,
